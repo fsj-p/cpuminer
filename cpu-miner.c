@@ -1083,12 +1083,19 @@ static void stratum_gen_work(struct stratum_ctx *sctx, struct work *work)
 	work->xnonce2 = realloc(work->xnonce2, sctx->xnonce2_size);
 	memcpy(work->xnonce2, sctx->job.xnonce2, sctx->xnonce2_size);
 
+	char print[sctx->job.coinbase_size*2];
+	bin2hex(print,sctx->job.coinbase,sctx->job.coinbase_size);
+	applog(LOG_INFO,"pubkeyB_serialized coinbase:%s\n",print);
 	/* Generate merkle root */
+	applog(LOG_INFO,"pubkeyB_serialized merkle_count:%d\n",sctx->job.merkle_count);
 	sha256d(merkle_root, sctx->job.coinbase, sctx->job.coinbase_size);
 	for (i = 0; i < sctx->job.merkle_count; i++) {
 		memcpy(merkle_root + 32, sctx->job.merkle[i], 32);
 		sha256d(merkle_root, merkle_root, 64);
 	}
+	char printRoot[128];
+	bin2hex(printRoot,merkle_root,64);
+	applog(LOG_INFO,"pubkeyB_serialized merkle_root:%s\n",printRoot);
 	
 	/* Increment extranonce2 */
 	for (i = 0; i < sctx->xnonce2_size && !++sctx->job.xnonce2[i]; i++);

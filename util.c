@@ -89,33 +89,37 @@ void applog(int prio, const char *fmt, ...)
 	if (0) {}
 #endif
 	else {
-		char *f;
-		int len;
-		time_t now;
-		struct tm tm, *tm_p;
+        char *f;
+        int len;
+        time_t now;
+        struct tm tm, *tm_p;
+        struct timeval tv;
+        struct timezone tz;
 
-		time(&now);
+        gettimeofday(&tv, &tz);
+        now = tv.tv_sec;
 
-		pthread_mutex_lock(&applog_lock);
-		tm_p = localtime(&now);
-		memcpy(&tm, tm_p, sizeof(tm));
-		pthread_mutex_unlock(&applog_lock);
+        pthread_mutex_lock(&applog_lock);
+        tm_p = gmtime(&now);
+        memcpy(&tm, tm_p, sizeof(tm));
+        pthread_mutex_unlock(&applog_lock);
 
-		len = 40 + strlen(fmt) + 2;
-		f = alloca(len);
-		sprintf(f, "[%d-%02d-%02d %02d:%02d:%02d] %s\n",
-			tm.tm_year + 1900,
-			tm.tm_mon + 1,
-			tm.tm_mday,
-			tm.tm_hour,
-			tm.tm_min,
-			tm.tm_sec,
-			fmt);
-		pthread_mutex_lock(&applog_lock);
-		vfprintf(stderr, f, ap);	/* atomic write to stderr */
-		fflush(stderr);
-		pthread_mutex_unlock(&applog_lock);
-	}
+        len = 50 + strlen(fmt) + 2; // Increased length to accommodate microseconds
+        f = alloca(len);
+        sprintf(f, "%d-%02d-%02dT%02d:%02d:%02d.%06ldZ %s\n",
+            tm.tm_year + 1900,
+            tm.tm_mon + 1,
+            tm.tm_mday,
+            tm.tm_hour,
+            tm.tm_min,
+            tm.tm_sec,
+            tv.tv_usec, // Print microseconds
+            fmt);
+        pthread_mutex_lock(&applog_lock);
+        vfprintf(stderr, f, ap);    /* atomic write to stderr */
+        fflush(stderr);
+        pthread_mutex_unlock(&applog_lock);
+    }
 	va_end(ap);
 }
 
