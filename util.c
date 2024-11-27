@@ -1233,15 +1233,15 @@ start:
 		applog(LOG_ERR, "Failed to get extranonce1");
 		goto out;
 	}
-	xn2_size = json_integer_value(json_array_get(res_val, 2));
-	if (!xn2_size) {
-		applog(LOG_ERR, "Failed to get extranonce2_size");
-		goto out;
-	}
-	if (xn2_size < 0 || xn2_size > 100) {
-		applog(LOG_ERR, "Invalid value of extranonce2_size");
-		goto out;
-	}
+	// xn2_size = json_integer_value(json_array_get(res_val, 2));
+	// if (!xn2_size) {
+	// 	applog(LOG_ERR, "Failed to get extranonce2_size");
+	// 	goto out;
+	// }
+	// if (xn2_size < 0 || xn2_size > 100) {
+	// 	applog(LOG_ERR, "Invalid value of extranonce2_size");
+	// 	goto out;
+	// }
 
 	pthread_mutex_lock(&sctx->work_lock);
 	free(sctx->session_id);
@@ -1375,8 +1375,8 @@ static bool stratum_notify(struct stratum_ctx *sctx, json_t *params)
 	sctx->job.xnonce2 = sctx->job.coinbase + coinb1_size + sctx->xnonce1_size;
 	hex2bin(sctx->job.coinbase, coinb1, coinb1_size);
 	memcpy(sctx->job.coinbase + coinb1_size, sctx->xnonce1, sctx->xnonce1_size);
-	if (!sctx->job.job_id || strcmp(sctx->job.job_id, job_id))
-		memset(sctx->job.xnonce2, 0, sctx->xnonce2_size);
+	// if (!sctx->job.job_id || strcmp(sctx->job.job_id, job_id))
+	// 	memset(sctx->job.xnonce2, 0, sctx->xnonce2_size);
 	hex2bin(sctx->job.xnonce2 + sctx->xnonce2_size, coinb2, coinb2_size);
 
 	free(sctx->job.job_id);

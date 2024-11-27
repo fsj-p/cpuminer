@@ -730,7 +730,7 @@ static bool submit_upstream_work(CURL *curl, struct work *work)
 		req = malloc(256 + strlen(rpc_user) + strlen(work->job_id) + 2 * work->xnonce2_len);
 		sprintf(req,
 			"{\"method\": \"mining.submit\", \"params\": [\"%s\", \"%s\", \"%s\", \"%s\", \"%s\"], \"id\":4}",
-			rpc_user, work->job_id, xnonce2str, ntimestr, noncestr);
+			rpc_user, work->job_id, "", ntimestr, noncestr);
 		free(xnonce2str);
 
 		rc = stratum_send_line(&stratum, req);
@@ -1081,7 +1081,7 @@ static void stratum_gen_work(struct stratum_ctx *sctx, struct work *work)
 	work->job_id = strdup(sctx->job.job_id);
 	work->xnonce2_len = sctx->xnonce2_size;
 	work->xnonce2 = realloc(work->xnonce2, sctx->xnonce2_size);
-	memcpy(work->xnonce2, sctx->job.xnonce2, sctx->xnonce2_size);
+	//memcpy(work->xnonce2, sctx->job.xnonce2, sctx->xnonce2_size);
 
 	char print[sctx->job.coinbase_size*2];
 	bin2hex(print,sctx->job.coinbase,sctx->job.coinbase_size);
@@ -1098,7 +1098,7 @@ static void stratum_gen_work(struct stratum_ctx *sctx, struct work *work)
 	applog(LOG_INFO,"pubkeyB_serialized merkle_root:%s\n",printRoot);
 	
 	/* Increment extranonce2 */
-	for (i = 0; i < sctx->xnonce2_size && !++sctx->job.xnonce2[i]; i++);
+	//for (i = 0; i < sctx->xnonce2_size && !++sctx->job.xnonce2[i]; i++);
 
 	/* Assemble block header */
 	memset(work->data, 0, 128);
